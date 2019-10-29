@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>GPA Calculator</title>
+	<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+</head>
+<body>
+	<div class="container">
+		<h1 class="text-center">GPA Calculator</h1>
+		<h1>Your GPA is: 
+			<span id='gpa' class="text-danger">0</span>
+		</h1>
+		<h2>Enter a grade</h2>
+		<ul id='grades-list' class='list-group'>
+		</ul>
+			<form>
+				<fieldset class="form-group">
+					<div>
+						<label for="form-name">Class Name:</label>
+						<input type="text" id="form-name">
+					</div>
+					<div>
+						<label for="form-credit">Number of Credits:</label>
+						<input type="number" id="form-credit"></input>
+					</div>
+					<div id="form-grade">
+						<label>Grade:</label>
+						<input type="radio" name="form-grade" value="4.00">A</input>
+						<input type="radio" name="form-grade" value="3.67">A-</input>
+						<input type="radio" name="form-grade" value="3.33">B+</input>
+						<input type="radio" name="form-grade" value="3.00">B</input>
+						<input type="radio" name="form-grade" value="3.00">B-</input>
+						<input type="radio" name="form-grade" value="2.33">C+</input>
+						<input type="radio" name="form-grade" value="2.00">C</input>
+						<input type="radio" name="form-grade" value="1.67">C-</input>
+						<input type="radio" name="form-grade" value="1.33">D+</input>
+						<input type="radio" name="form-grade" value="1.00">D</input>
+						<input type="radio" name="form-grade" value="0.67">D-</input>
+						<input type="radio" name="form-grade" value="0">F</input>
+					</div>
+				</fieldset>
+				<div>
+					<button class="btn btn-primary" type="submit" id='add-button'>Add</button>
+				</div>
+	
+			</form>
+		</div>
+</body>
+<script>
+	let gpa = 0;
+
+function main () {
+	// initialization
+	const addButton = document.getElementById('add-button');
+	addButton.addEventListener('click', add);
+}
+
+function getFormInfo() {
+	const name = document.getElementById('form-name').value;
+	const credit = document.getElementById('form-credit').value;
+	const grade = document.querySelector('input[name=form-grade]:checked').value;
+	// clear form
+	document.getElementById('form-name').value = '';
+	document.getElementById('form-credit').value = '';
+	document.querySelector('input[name=form-grade]:checked').checked = false;
+	return [name, credit, grade];
+}
+
+function calGPA() {
+	let gpa = 0;
+	let totalGrade = 0;
+	let totalCredit = 0;
+	const gpa_span = document.getElementById('gpa');
+	const items = document.querySelectorAll('.entered-info');
+	items.forEach(item => {
+		credit = parseInt(item.children[1].children[0].innerText);
+		grade = parseFloat(item.children[2].children[0].innerText);
+		totalGrade += credit * grade;
+		totalCredit += credit;
+	})
+	gpa = totalGrade / totalCredit;
+	gpa_span.innerText = gpa ? gpa.toFixed(2) : '0';
+}
+
+function add(e) {
+	e.preventDefault();
+	[name, credit, grade] = getFormInfo();
+	if (credit === '' || credit <= 0){
+		alert('Error: Number of credits must be greater than 0');
+	} else if (!grade) {
+		alert('Error: Letter grade cannot be empty!');
+	} else {
+		const list = document.getElementById('grades-list');
+		const newitem = document.createElement('li');
+		const newcard = document.createElement('div');
+		const newcardbody = document.createElement("div");
+		const name_h5 = document.createElement("h5");
+		const credit_p = document.createElement("p");
+		const credit_span = document.createElement("span");
+		const grade_p = document.createElement("p");
+		const grade_span = document.createElement("span");
+		const close_icon = document.createElement('span');
+
+		name_h5.append(document.createTextNode('Class Name: ' + name));
+		credit_p.append(document.createTextNode('Number of Credits: '));
+		credit_p.appendChild(credit_span);
+		credit_span.append(document.createTextNode(credit));
+		// credit_span.classList.add('is-credit');
+		grade_p.append(document.createTextNode('Grade: '));
+		grade_p.appendChild(grade_span);
+		grade_span.append(document.createTextNode(grade));
+		// grade_span.classList.add('is-grade');
+
+		close_icon.appendChild(document.createTextNode('\u274e'))
+		newcard.appendChild(close_icon)
+		newcardbody.appendChild(name_h5);
+		newcardbody.appendChild(credit_p);
+		newcardbody.appendChild(grade_p);
+		newcard.appendChild(newcardbody);
+		newitem.appendChild(newcard);
+		list.appendChild(newitem);
+
+		close_icon.classList.add('close-icon')
+		close_icon.classList.add('text-right')
+		newitem.classList.add('list-group-item');
+		newcard.classList.add('card');
+		newcard.classList.add('rounded');
+		newcard.classList.add('border');
+		newcard.classList.add('bg-light');
+		newcardbody.classList.add('card-body', 'entered-info');
+
+		close_icon.addEventListener('click', () => {
+			while (newitem.firstChild) {
+				newitem.removeChild(newitem.firstChild);
+			}
+			list.removeChild(newitem);
+			calGPA();
+		})
+	}
+	calGPA();
+}
+
+
+window.onload = main;
+</script>
+</html>
